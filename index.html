@@ -658,12 +658,37 @@
   .quiz-btn:active { background: rgba(255,255,255,0.14); }
   .quiz-q { font-size: 14px; color: rgba(255,255,255,0.82); }
   .quiz-cta { font-size: 17px; font-weight: 600; letter-spacing: 0.01em; }
-  .next-visitor { margin-top: 48px; }
-
-  @media (max-height: 850px) and (min-width: 861px) {
-    .welcome-to { font-size: 34px; }
-    .welcome-address { font-size: 17px; }
+  /* Next visitor: solid and easy to find, the quiz stays a quiet outline */
+  .next-visitor {
+    margin-top: 40px;
+    padding: 15px 40px;
+    background: var(--soft-white);
+    border: none;
+    border-radius: 2px;
+    color: var(--deep-ocean);
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    box-shadow: 0 6px 24px rgba(10,25,30,0.25);
   }
+  .next-visitor:hover, .next-visitor:active { background: #fff; color: var(--deep-ocean-dark); }
+
+  /* Welcome line: one line, one font */
+  .form-inner h2.welcome#welcomeLine {
+    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+    font-size: 34px; font-weight: 500; line-height: 1.15; color: var(--deep-ocean);
+    margin: 0 0 8px; text-wrap: balance;
+  }
+  #welcomeLine.fitting { white-space: nowrap !important; text-wrap: nowrap !important; overflow: hidden; }
+
+  /* Address above the price on the photo */
+  .listing-address {
+    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+    font-size: 21px; font-weight: 400; line-height: 1.25;
+    color: rgba(255,255,255,0.9); margin-bottom: 6px;
+  }
+  .listing-address:empty { display: none; }
+
 
   @media (max-width: 860px) {
     .logo-img { width: 130px; }
@@ -745,6 +770,7 @@
       <div class="brand-quote" id="brandQuote">Aloha, and welcome home. Tell us a little about yourself and we'll take great care of you.</div>
 
       <div class="listing" id="listing" hidden>
+        <div class="listing-address" id="lAddress"></div>
         <div class="listing-price" id="lPrice"></div>
         <dl class="listing-stats" id="lStats"></dl>
       </div>
@@ -758,7 +784,7 @@
 
     <div class="form-panel">
       <div class="form-inner">
-        <h2 class="welcome"><span class="welcome-to">Welcome to</span><span class="welcome-address" id="displayAddress">&mdash;</span></h2>
+        <h2 class="welcome" id="welcomeLine">Welcome to <span id="displayAddress">&mdash;</span></h2>
         <p class="lede">Please sign in. It takes less than a minute.</p>
 
         <form id="signinForm">
@@ -800,10 +826,10 @@
           <div class="field">
             <label>How did you hear about this open house? <span class="optional-tag">(optional)</span></label>
             <div class="chip-group" id="sourceGroup" data-value="">
-              <button type="button" class="chip" data-val="sign">Drove by / sign</button>
+              <button type="button" class="chip" data-val="sign">Drove by / Sign</button>
               <button type="button" class="chip" data-val="zillow">Zillow</button>
-              <button type="button" class="chip" data-val="referral">Referral</button>
-              <button type="button" class="chip" data-val="online">Online search</button>
+              <button type="button" class="chip" data-val="online">Online Search</button>
+              <button type="button" class="chip" data-val="realtor">My Realtor</button>
               <button type="button" class="chip" data-val="other">Other</button>
             </div>
           </div>
@@ -865,7 +891,7 @@
   const SEND_TIMEOUT_MS = 25000;
 
   const TIMELINE_LABELS = { 'browsing': 'Just looking', '0-3mo': '0 to 3 months', '12mo': '3-12 months' };
-  const SOURCE_LABELS = { sign: 'Drove by / sign', zillow: 'Zillow', referral: 'Referral', online: 'Online search', other: 'Other' };
+  const SOURCE_LABELS = { sign: 'Drove by / Sign', zillow: 'Zillow', online: 'Online Search', realtor: 'My Realtor', other: 'Other', referral: 'Referral' };
 
   const $ = (id) => document.getElementById(id);
 
@@ -920,7 +946,25 @@
     displayAddress.textContent = address;
     renderListing();
     showScreen(signinScreen);
+    fitWelcome();
   }
+
+  function fitWelcome() {
+    const el = $('welcomeLine');
+    if (!el || !el.offsetParent) return;
+    el.classList.add('fitting');
+    let size = 34;
+    el.style.fontSize = size + 'px';
+    while (el.scrollWidth > el.clientWidth && size > 24) {
+      size -= 1;
+      el.style.fontSize = size + 'px';
+    }
+    // Very long addresses: rather than tiny type, use a comfortable size over two balanced lines.
+    if (el.scrollWidth > el.clientWidth) el.style.fontSize = '28px';
+    el.classList.remove('fitting');
+  }
+  window.addEventListener('resize', fitWelcome);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitWelcome);
 
   /* ---------------- background photos ---------------- */
   // To add a photo: put name.jpg and name-thumb.jpg in assets/bg, add a line here,
@@ -994,6 +1038,7 @@
 
     const price = clean('price') ? fmtPrice(clean('price')) : '';
     $('lPrice').textContent = price;
+    $('lAddress').textContent = loadStr(KEYS.address) || '';
     const dl = $('lStats');
     dl.textContent = '';
     stats.forEach(([val, label]) => {
@@ -1352,6 +1397,7 @@
 
   $('nextVisitorBtn').addEventListener('click', () => {
     showScreen(signinScreen);
+    fitWelcome();
     fullName.focus();
   });
 

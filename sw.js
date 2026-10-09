@@ -7,7 +7,7 @@
  * To ship a change: edit the files, bump VERSION below, upload to GitHub.
  * The iPad picks up the new version the next time it opens the page online.
  */
-const VERSION = 'ohs-v3';
+const VERSION = 'ohs-v4';
 
 const SHELL = [
   './',
