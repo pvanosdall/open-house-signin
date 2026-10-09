@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Open House Sign-In · Hawaii LUX Homes</title>
+<meta name="theme-color" content="#3B5F6B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Sign-In">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="preload" href="fonts/fraunces-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/work-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+  /* Fonts live inside this folder, so the page looks identical with no internet. */
+  @font-face { font-family: 'Fraunces'; src: url('fonts/fraunces-latin-wght-normal.woff2') format('woff2'); font-weight: 100 900; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Work Sans'; src: url('fonts/work-sans-latin-wght-normal.woff2') format('woff2'); font-weight: 100 900; font-style: normal; font-display: swap; }
+
+  :root {
+    --deep-ocean: #3B5F6B;
+    --deep-ocean-dark: #2E4B55;
+    --sea-glass: #86ACBB;
+    --soft-white: #F8F7F4;
+    --warm-sand: #E7E1D7;
+    --sunset-gold: #C89B63;
+    --sunset-gold-dark: #B4854D;
+    --palm-sage: #87977D;
+    --charcoal: #2C2C2C;
+    --line: rgba(59, 95, 107, 0.16);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: var(--soft-white);
+    color: var(--charcoal);
+    font-family: 'Work Sans', -apple-system, 'Helvetica Neue', Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior: none;
+  }
+
+  body {
+    display: flex;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  .serif {
+    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+  }
+
+  button {
+    font-family: inherit;
+  }
+
+  input:focus-visible,
+  button:focus-visible {
+    outline: 2px solid var(--sunset-gold);
+    outline-offset: 2px;
+  }
+
+  /* ---------- App shell ---------- */
+
+  #app {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ================= SETUP SCREEN (staff only) ================= */
+
+  .setup-screen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    min-height: 100dvh;
+    width: 100%;
+    padding: 32px;
+    background: var(--soft-white);
+  }
+
+  .setup-card {
+    width: 100%;
+    max-width: 420px;
+    text-align: left;
+  }
+
+  .setup-eyebrow {
+    color: var(--palm-sage);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    margin-bottom: 8px;
+  }
+
+  .setup-card h1 {
+    font-size: 28px;
+    margin: 0 0 8px;
+    color: var(--deep-ocean);
+    font-weight: 500;
+  }
+
+  .setup-card p.helper {
+    margin: 0 0 28px;
+    color: #5a6b70;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  .field {
+    margin-bottom: 18px;
+  }
+
+  .field label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: var(--deep-ocean);
+  }
+
+  .field input[type="text"],
+  .field input[type="email"],
+  .field input[type="tel"] {
+    width: 100%;
+    padding: 15px 16px;
+    font-size: 16px;
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    background: #fff;
+    color: var(--charcoal);
+    font-family: 'Work Sans', -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  .field input::placeholder { color: #9aa9ac; }
+
+  .btn-primary {
+    width: 100%;
+    padding: 17px 20px;
+    border: none;
+    border-radius: 10px;
+    background: var(--sunset-gold);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+  }
+
+  .btn-primary:hover { background: var(--sunset-gold-dark); }
+  .btn-primary:active { transform: scale(0.99); }
+
+  .btn-primary:disabled {
+    background: #d8cdb8;
+    cursor: not-allowed;
+  }
+
+  /* ================= SIGN-IN SCREEN ================= */
+
+  .signin-screen {
+    display: none;
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  .signin-screen.active { display: flex; }
+
+  /* Brand panel */
+  .brand-panel {
+    background: var(--deep-ocean);
+    color: var(--soft-white);
+    flex: 0 0 38%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 48px 44px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .brand-top {
+    position: relative;
+    z-index: 2;
+  }
+
+  .mark {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 20px;
+  }
+
+  .wordmark {
+    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+    font-size: 26px;
+    letter-spacing: 0.01em;
+    line-height: 1.15;
+    margin: 0 0 4px;
+  }
+
+  .wordmark-sub {
+    font-size: 12.5px;
+    letter-spacing: 0.14em;
+    color: var(--sunset-gold);
+    font-weight: 600;
+  }
+
+  .brand-quote {
+    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+    font-size: 22px;
+    line-height: 1.45;
+    font-weight: 400;
+    max-width: 320px;
+    color: #eef3f4;
+    position: relative;
+    z-index: 2;
+  }
+
+  .brand-bottom {
+    position: relative;
+    z-index: 2;
+  }
+
+  .property-label {
+    font-size: 12.5px;
+    letter-spacing: 0.1em;
+    color: var(--sea-glass);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .property-address {
+    font-size: 17px;
+    line-height: 1.4;
+    color: #fff;
+    margin: 0 0 14px;
+  }
+
+  .change-address {
+    background: none;
+    border: none;
+    color: var(--sea-glass);
+    font-size: 13px;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 4px 0;
+    font-family: 'Work Sans', -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  .change-address:hover { color: #fff; }
+
+  .wave-motif {
+    position: absolute;
+    bottom: -20px;
+    left: -10px;
+    right: -10px;
+    opacity: 0.14;
+    z-index: 1;
+  }
+
+  /* Form panel */
+  .form-panel {
+    flex: 1;
+    background: var(--soft-white);
+    padding: 48px 48px 40px;
+    overflow-y: auto;
+    display: flex;
+    justify-content: center;
+  }
+
+  .form-inner {
+    width: 100%;
+    max-width: 460px;
+  }
+
+  .form-inner h2 {
+    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+    font-size: 30px;
+    font-weight: 500;
+    color: var(--deep-ocean);
+    margin: 0 0 6px;
+  }
+
+  .form-inner p.lede {
+    color: #5a6b70;
+    font-size: 15px;
+    margin: 0 0 30px;
+  }
+
+  .row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .chip-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .chip {
+    flex: 1 1 auto;
+    padding: 14px 18px;
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    background: #fff;
+    color: var(--charcoal);
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.12s ease;
+    white-space: nowrap;
+  }
+
+  .chip:hover { border-color: var(--sea-glass); }
+
+  .chip.selected {
+    background: var(--deep-ocean);
+    border-color: var(--deep-ocean);
+    color: #fff;
+  }
+
+  .or-divider {
+    text-align: center;
+    color: #9aa9ac;
+    font-size: 13px;
+    margin: 10px 0;
+  }
+
+  .agent-row {
+    display: flex;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .agent-row input[type="text"] {
+    flex: 1.3;
+    width: auto;
+  }
+
+  .or-divider-inline {
+    align-self: center;
+    color: #9aa9ac;
+    font-size: 13px;
+    flex: 0 0 auto;
+  }
+
+  .chip-block {
+    display: block;
+    width: 100%;
+  }
+
+  .agent-row .chip-block {
+    flex: 1;
+    width: auto;
+  }
+
+  .chip-block.selected {
+    background: var(--palm-sage);
+    border-color: var(--palm-sage);
+  }
+
+  .optional-tag {
+    font-size: 12px;
+    color: #9aa9ac;
+    font-weight: 400;
+    text-transform: none;
+  }
+
+  .required-note {
+    font-size: 13px;
+    color: #9aa9ac;
+    margin-top: 22px;
+    margin-bottom: 0;
+  }
+
+  /* ================= THANK YOU SCREEN ================= */
+
+  .thanks-screen {
+    display: none;
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+    background: var(--deep-ocean);
+    color: #fff;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px;
+    position: relative;
+  }
+
+  .thanks-screen.active { display: flex; flex-direction: column; }
+
+  .thanks-content {
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  .thanks-mark {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 28px;
+  }
+
+  .thanks-content h2 {
+    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+    font-size: 38px;
+    font-weight: 500;
+    margin: 0 0 16px;
+  }
+
+  .thanks-content p {
+    font-size: 17px;
+    line-height: 1.6;
+    color: #dfe9eb;
+    margin: 0;
+  }
+
+  .next-visitor {
+    margin-top: 64px;
+    background: none;
+    border: 1.5px solid rgba(255,255,255,0.35);
+    color: rgba(255,255,255,0.75);
+    padding: 12px 26px;
+    border-radius: 100px;
+    font-size: 13.5px;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+  }
+
+  .next-visitor:hover {
+    border-color: rgba(255,255,255,0.6);
+    color: #fff;
+  }
+
+  /* ================= RESPONSIVE ================= */
+
+  @media (max-width: 860px) {
+    .signin-screen { flex-direction: column; }
+
+    .brand-panel {
+      flex: 0 0 auto;
+      padding: 32px 28px;
+      min-height: 0;
+    }
+
+    .brand-quote { display: none; }
+    .wave-motif { display: none; }
+
+    .form-panel {
+      padding: 32px 24px 40px;
+    }
+
+    .row-2 { grid-template-columns: 1fr; }
+
+    .agent-row {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .agent-row input[type="text"] { flex: none; width: 100%; }
+    .agent-row .chip-block { flex: none; width: 100%; }
+    .or-divider-inline { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+
+  /* Compress vertical rhythm on shorter landscape screens (e.g. iPad) */
+  @media (max-height: 850px) and (min-width: 861px) {
+    .brand-panel { padding: 32px 40px; }
+    .form-panel { padding: 32px 44px 28px; }
+    .form-inner h2 { font-size: 26px; margin-bottom: 4px; }
+    .form-inner p.lede { margin-bottom: 20px; }
+    .field { margin-bottom: 14px; }
+    .chip { padding: 12px 16px; }
+  }
+
+  /* ---------- touch + logo ---------- */
+  button, input, .chip { touch-action: manipulation; }
+
+  .logo-img { display: block; width: 210px; height: auto; margin: -6px 0 0 -6px; }
+  .thanks-logo { display: block; width: 190px; height: auto; margin: 0 auto 26px; opacity: 0.95; }
+
+  /* ---------- sync badge (small, for Peter) ---------- */
+  .sync-status {
+    display: flex; align-items: center; gap: 8px;
+    margin-top: 10px; padding: 6px 0;
+    background: none; border: none; cursor: pointer;
+    color: rgba(255,255,255,0.62); font-size: 12.5px; letter-spacing: 0.01em;
+  }
+  .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #9aa9ac; flex: 0 0 auto; }
+  .sync-status[data-state="ok"] .sync-dot { background: #87977D; }
+  .sync-status[data-state="warn"] .sync-dot { background: #C89B63; }
+  .sync-status[data-state="off"] .sync-dot { background: #9aa9ac; }
+
+  .missing-hint { min-height: 18px; margin: 10px 0 0; font-size: 13px; color: #8a6a3f; text-align: center; }
+
+  /* ---------- staff tools ---------- */
+  .setup-screen { overflow-y: auto; align-items: flex-start; }
+  .setup-card { max-width: 460px; margin: auto; padding: 8px 0 40px; }
+
+  .conn-warn {
+    margin-top: 18px; padding: 12px 14px; border-radius: 10px;
+    background: #F6EBD2; color: #7A5C1E; font-size: 13.5px; line-height: 1.45;
+  }
+  .staff-tools { margin-top: 26px; border-top: 1px solid var(--line); padding-top: 14px; }
+  .staff-tools summary { cursor: pointer; font-size: 14px; font-weight: 600; color: var(--deep-ocean); padding: 6px 0; }
+  .tool-row { display: flex; justify-content: space-between; gap: 16px; font-size: 14px; padding: 7px 0; border-bottom: 1px solid var(--line); }
+  .tool-row span { color: #5a6b70; }
+  .tool-row strong { font-weight: 600; color: var(--charcoal); text-align: right; }
+  .tool-label { display: block; margin: 18px 0 8px; font-size: 13.5px; font-weight: 500; color: var(--deep-ocean); }
+  .tool-inline { display: flex; gap: 10px; }
+  .tool-inline input {
+    flex: 1; min-width: 0; padding: 12px 14px; font-size: 14px; border: 1.5px solid var(--line);
+    border-radius: 10px; background: #fff; font-family: inherit;
+  }
+  .tool-msg { min-height: 18px; margin: 8px 0 0; font-size: 13px; color: #5a6b70; line-height: 1.4; }
+  .tool-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+  .btn-secondary {
+    padding: 12px 16px; border-radius: 10px; border: 1.5px solid var(--deep-ocean);
+    background: transparent; color: var(--deep-ocean); font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+  .btn-secondary:active { background: rgba(59,95,107,0.08); }
+
+  /* An element with the hidden attribute must stay hidden even if a class sets display. */
+  [hidden] { display: none !important; }
+
+  /* Agent row: the "no agent" button keeps its natural width, the name field takes the rest. */
+  .agent-row input[type="text"] { flex: 1 1 0; min-width: 0; }
+  .agent-row .chip-block { flex: 0 0 auto; width: auto; }
+
+  /* Even, aligned choice buttons */
+  #timelineGroup { display: grid; grid-template-columns: repeat(3, 1fr); }
+  #sourceGroup { display: grid; grid-template-columns: repeat(6, 1fr); }
+  #sourceGroup .chip:nth-child(-n+3) { grid-column: span 2; }
+  #sourceGroup .chip:nth-child(n+4) { grid-column: span 3; }
+  #timelineGroup .chip, #sourceGroup .chip { padding-left: 8px; padding-right: 8px; }
+
+  /* ---------- photo + team logo ---------- */
+  .brand-panel {
+    background-color: var(--deep-ocean);
+    background-size: cover;
+    background-position: center;
+  }
+  .logo-img { width: 190px; margin: 0; filter: drop-shadow(0 1px 8px rgba(20,40,50,0.35)); }
+  .brand-quote { text-shadow: 0 1px 12px rgba(20,40,50,0.45); }
+  .change-address { color: rgba(255,255,255,0.8); }
+  .sync-status { color: rgba(255,255,255,0.8); }
+
+  .thanks-screen {
+    background-color: var(--deep-ocean);
+    background-size: cover;
+    background-position: center;
+  }
+  .thanks-logo { width: 170px; margin-bottom: 30px; }
+
+  .setup-logo { display: block; width: 120px; height: auto; margin: 0 0 28px; }
+
+  .form-inner h2.welcome {
+    font-size: 30px;
+    line-height: 1.2;
+    text-wrap: balance;
+    margin-bottom: 8px;
+  }
+
+
+  /* ---------- selectable background photo ---------- */
+  :root { --bg-photo: url('assets/bg/ocean.jpg'); }
+  .brand-panel {
+    background-image:
+      linear-gradient(180deg, rgba(30,50,58,0.55) 0%, rgba(30,50,58,0.22) 38%, rgba(30,50,58,0.55) 62%, rgba(30,50,58,0.86) 100%),
+      var(--bg-photo);
+  }
+  .thanks-screen {
+    background-image: linear-gradient(rgba(30,50,58,0.62), rgba(30,50,58,0.66)), var(--bg-photo);
+  }
+
+  /* ---------- heading: "Welcome to" leads, address supports ---------- */
+  .form-inner h2.welcome { font-size: inherit; margin: 0 0 10px; text-wrap: balance; }
+  .welcome-to {
+    display: block;
+    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+    font-size: 38px;
+    font-weight: 500;
+    line-height: 1.1;
+    color: var(--deep-ocean);
+    margin: 0 0 6px;
+  }
+  .welcome-address {
+    display: block;
+    font-family: 'Work Sans', -apple-system, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1.35;
+    color: var(--charcoal);
+  }
+  .form-inner p.lede { font-size: 14.5px; }
+
+  /* ---------- listing details on the photo ---------- */
+  .listing { position: relative; z-index: 2; color: #fff; margin-top: auto; padding-bottom: 26px; text-shadow: 0 1px 10px rgba(15,30,36,0.5); }
+  .listing-price {
+    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+    font-size: 32px; font-weight: 500; line-height: 1.1; margin-bottom: 18px;
+  }
+  .listing-price:empty { display: none; }
+  .listing-stats {
+    display: grid; grid-template-columns: repeat(3, auto); justify-content: start;
+    column-gap: 30px; row-gap: 16px; margin: 0;
+  }
+  .listing-stats div { min-width: 0; }
+  .listing-stats dd { margin: 0; font-size: 19px; font-weight: 500; line-height: 1.2; white-space: nowrap; }
+  .listing-stats dt { margin: 3px 0 0; font-size: 12px; color: rgba(255,255,255,0.78); }
+  .signin-screen.has-listing .brand-quote { display: none; }
+  .brand-bottom { padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.18); }
+
+  /* ---------- setup screen groups ---------- */
+  .setup-card { max-width: 560px; }
+  .setup-group { border: none; padding: 0; margin: 6px 0 22px; min-width: 0; }
+  .setup-group legend { padding: 0; font-size: 14px; font-weight: 600; color: var(--deep-ocean); margin-bottom: 10px; }
+  .detail-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .detail-grid label { display: block; font-size: 12.5px; color: #5a6b70; margin-bottom: 5px; }
+  .detail-grid input {
+    width: 100%; padding: 11px 12px; font-size: 15px; border: 1.5px solid var(--line);
+    border-radius: 10px; background: #fff; color: var(--charcoal); font-family: inherit;
+  }
+  .photo-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .photo-opt {
+    position: relative; padding: 0; border: 2px solid transparent; border-radius: 10px; overflow: hidden;
+    background: #ddd; cursor: pointer; aspect-ratio: 4 / 3;
+  }
+  .photo-opt img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .photo-opt span {
+    position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 8px 5px; font-size: 12px; color: #fff; text-align: left;
+    background: linear-gradient(transparent, rgba(0,0,0,0.55));
+  }
+  .photo-opt[aria-checked="true"] { border-color: var(--sunset-gold); box-shadow: 0 0 0 2px var(--sunset-gold); }
+
+  /* ---------- quiz button ---------- */
+  .quiz-btn {
+    display: inline-flex; flex-direction: column; align-items: center; gap: 4px;
+    margin-top: 34px; padding: 16px 30px;
+    border: 1.5px solid rgba(255,255,255,0.9); border-radius: 2px;
+    color: #fff; text-decoration: none; background: rgba(255,255,255,0.04);
+    transition: background 0.15s ease;
+  }
+  .quiz-btn:active { background: rgba(255,255,255,0.14); }
+  .quiz-q { font-size: 14px; color: rgba(255,255,255,0.82); }
+  .quiz-cta { font-size: 17px; font-weight: 600; letter-spacing: 0.01em; }
+  .next-visitor { margin-top: 48px; }
+
+  @media (max-height: 850px) and (min-width: 861px) {
+    .welcome-to { font-size: 34px; }
+    .welcome-address { font-size: 17px; }
+  }
+
+  @media (max-width: 860px) {
+    .logo-img { width: 130px; }
+    .listing { display: none; }
+    .detail-grid { grid-template-columns: repeat(2, 1fr); }
+    .photo-grid { grid-template-columns: repeat(3, 1fr); }
+    .agent-row .chip-block { flex: none; width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ============ SETUP SCREEN (staff only, shown before an open house starts) ============ -->
+  <div class="setup-screen" id="setupScreen">
+    <div class="setup-card">
+      <img class="setup-logo" src="assets/logo-dark.png" alt="Hawaii LUX of eXp Realty">
+      <div class="setup-eyebrow">STAFF SETUP</div>
+      <h1 class="serif">Set up this open house</h1>
+      <p class="helper">Enter the property address before guests start signing in. You can change any of this later from Staff setup.</p>
+      <div class="field">
+        <label for="setupAddress">Property address</label>
+        <input type="text" id="setupAddress" placeholder="e.g. 633 Keolu Dr, Kailua" autocomplete="off">
+      </div>
+
+      <fieldset class="setup-group">
+        <legend>Listing details <span class="optional-tag">(optional, blank fields stay hidden)</span></legend>
+        <div class="detail-grid">
+          <div><label for="dPrice">Price</label><input type="text" id="dPrice" inputmode="decimal" placeholder="1295000" autocomplete="off"></div>
+          <div><label for="dBeds">Bedrooms</label><input type="text" id="dBeds" inputmode="decimal" placeholder="3" autocomplete="off"></div>
+          <div><label for="dBaths">Bathrooms</label><input type="text" id="dBaths" inputmode="decimal" placeholder="2.5" autocomplete="off"></div>
+          <div><label for="dSqft">Home sq ft</label><input type="text" id="dSqft" inputmode="decimal" placeholder="1850" autocomplete="off"></div>
+          <div><label for="dLot">Lot size</label><input type="text" id="dLot" placeholder="7500 or 0.25 acre" autocomplete="off"></div>
+          <div><label for="dHoa">HOA fee</label><input type="text" id="dHoa" placeholder="450 or None" autocomplete="off"></div>
+        </div>
+      </fieldset>
+
+      <fieldset class="setup-group">
+        <legend>Background photo</legend>
+        <div class="photo-grid" id="photoGrid" role="radiogroup" aria-label="Background photo"></div>
+      </fieldset>
+
+      <button class="btn-primary" id="startBtn" disabled>Start sign-ins</button>
+
+      <div class="conn-warn" id="connWarn" hidden>Not connected to Google Sheets yet. Sign-ins are saved on this iPad and will send automatically once a web app URL is added below.</div>
+
+      <details class="staff-tools" id="staffTools">
+        <summary>Staff tools</summary>
+        <div class="tool-row"><span>Connection</span><strong id="stConn">&mdash;</strong></div>
+        <div class="tool-row"><span>Waiting to send</span><strong id="stQueue">0</strong></div>
+        <div class="tool-row"><span>Last sent</span><strong id="stLast">never</strong></div>
+        <div class="tool-row" id="stErrRow" hidden><span>Last problem</span><strong id="stErr"></strong></div>
+
+        <label for="endpointInput" class="tool-label">Google Sheets web app URL</label>
+        <div class="tool-inline">
+          <input type="text" id="endpointInput" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false">
+          <button type="button" class="btn-secondary" id="saveEndpointBtn">Save</button>
+        </div>
+        <p class="tool-msg" id="endpointMsg"></p>
+
+        <div class="tool-actions">
+          <button type="button" class="btn-secondary" id="syncNowBtn">Send now</button>
+          <button type="button" class="btn-secondary" id="testEntryBtn">Send a test sign-in</button>
+          <button type="button" class="btn-secondary" id="csvBtn">Download backup (CSV)</button>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <!-- ============ SIGN-IN SCREEN (guest facing) ============ -->
+  <div class="signin-screen" id="signinScreen">
+
+    <div class="brand-panel">
+      <div class="brand-top">
+        <img class="logo-img" src="assets/logo-white.png" alt="Hawaii LUX of eXp Realty">
+      </div>
+
+      <div class="brand-quote" id="brandQuote">Aloha, and welcome home. Tell us a little about yourself and we'll take great care of you.</div>
+
+      <div class="listing" id="listing" hidden>
+        <div class="listing-price" id="lPrice"></div>
+        <dl class="listing-stats" id="lStats"></dl>
+      </div>
+
+      <div class="brand-bottom">
+        <button class="change-address" id="changeAddressBtn">Staff setup</button>
+        <button type="button" class="sync-status" id="syncStatus" data-state="warn" aria-live="polite"><span class="sync-dot"></span><span class="sync-text">Starting&hellip;</span></button>
+      </div>
+
+    </div>
+
+    <div class="form-panel">
+      <div class="form-inner">
+        <h2 class="welcome"><span class="welcome-to">Welcome to</span><span class="welcome-address" id="displayAddress">&mdash;</span></h2>
+        <p class="lede">Please sign in. It takes less than a minute.</p>
+
+        <form id="signinForm">
+
+          <div class="field">
+            <label for="fullName">Full name</label>
+            <input type="text" id="fullName" required autocomplete="name" autocapitalize="words" autocorrect="off" spellcheck="false" enterkeyhint="next">
+          </div>
+
+          <div class="row-2 field">
+            <div>
+              <label for="email">Email</label>
+              <input type="email" id="email" required autocomplete="email" inputmode="email" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="next">
+            </div>
+            <div>
+              <label for="phone">Phone</label>
+              <input type="tel" id="phone" required autocomplete="tel" inputmode="tel" placeholder="(808) 000-0000" enterkeyhint="next">
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="agentName">Do you have a real estate agent?</label>
+            <div class="agent-row">
+              <input type="text" id="agentName" placeholder="Your agent's name" autocomplete="off" autocapitalize="words" autocorrect="off" spellcheck="false" enterkeyhint="done">
+              <span class="or-divider-inline">or</span>
+              <button type="button" class="chip chip-block" id="noAgentBtn">I don't have an agent</button>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>What's your timeline? <span class="optional-tag">(optional)</span></label>
+            <div class="chip-group" id="timelineGroup" data-value="">
+              <button type="button" class="chip" data-val="browsing">Just looking</button>
+              <button type="button" class="chip" data-val="0-3mo">0 to 3 months</button>
+              <button type="button" class="chip" data-val="12mo">3–12 months</button>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>How did you hear about this open house? <span class="optional-tag">(optional)</span></label>
+            <div class="chip-group" id="sourceGroup" data-value="">
+              <button type="button" class="chip" data-val="sign">Drove by / sign</button>
+              <button type="button" class="chip" data-val="zillow">Zillow</button>
+              <button type="button" class="chip" data-val="referral">Referral</button>
+              <button type="button" class="chip" data-val="online">Online search</button>
+              <button type="button" class="chip" data-val="other">Other</button>
+            </div>
+          </div>
+
+          <button class="btn-primary" type="submit" id="submitBtn" style="margin-top: 8px;" disabled>Sign in</button>
+          <p class="missing-hint" id="missingHint" aria-live="polite"></p>
+          <p class="required-note">Your information is only used to help Peter follow up about your home search.</p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ THANK YOU SCREEN ============ -->
+  <div class="thanks-screen" id="thanksScreen">
+    <div class="thanks-content">
+      <img class="thanks-logo" src="assets/logo-white.png" alt="Hawaii LUX of eXp Realty">
+      <h2 class="serif" id="thanksHeadline">Mahalo!</h2>
+      <p>You're all set. Peter will follow up with you soon, thanks for stopping by the open house today.</p>
+      <a class="quiz-btn" id="quizBtn" href="https://pvanosdall.github.io/Oahu-Real-Estate-Quiz/">
+        <span class="quiz-q">Want personalized properties?</span>
+        <span class="quiz-cta">Take my 60-second home quiz</span>
+      </a>
+    </div>
+    <button class="next-visitor" id="nextVisitorBtn">Next visitor →</button>
+  </div>
+
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  /* ===================== CONFIG =====================
+     Paste your Google Apps Script "Web app" URL (it ends in /exec) between the
+     quotes. You can also paste it on the setup screen under Staff tools, which
+     saves it on this iPad without editing this file.
+     Until a URL is set, sign-ins are NOT lost: they wait on the iPad and send
+     automatically as soon as a URL is added.
+  ==================================================== */
+  const CONFIG = {
+    ENDPOINT: 'https://script.google.com/macros/s/AKfycbySY_ITSpns-Hqrorvs3_nVNYelp9zPP0KwN-5DAXnUoI6ztbfOCQzQndNQUd4Ai7UsqQ/exec',
+    // Tapping "Staff setup" asks for this PIN, so guests can't wander into the
+    // setup screen (which has the CSV download of everyone who signed in).
+    // Change it to any digits you like. Leave '' to turn the PIN off.
+    STAFF_PIN: '4196'
+  };
+
+  const KEYS = {
+    address: 'ohs_property_address',
+    details: 'ohs_listing_details',
+    photo: 'ohs_photo',
+    queue: 'ohs_queue',        // sign-ins waiting to be sent
+    failed: 'ohs_failed',      // sign-ins the server refused (kept, never deleted)
+    backup: 'ohs_backup',      // local copy of every sign-in, for the CSV download
+    endpoint: 'ohs_endpoint',
+    lastSync: 'ohs_last_sync'
+  };
+  const BACKUP_MAX = 500;
+  const SEND_TIMEOUT_MS = 25000;
+
+  const TIMELINE_LABELS = { 'browsing': 'Just looking', '0-3mo': '0 to 3 months', '12mo': '3-12 months' };
+  const SOURCE_LABELS = { sign: 'Drove by / sign', zillow: 'Zillow', referral: 'Referral', online: 'Online search', other: 'Other' };
+
+  const $ = (id) => document.getElementById(id);
+
+  /* ---------------- safe storage ---------------- */
+  const mem = {};
+  function loadStr(key) {
+    try { const v = localStorage.getItem(key); if (v !== null) return v; } catch (e) {}
+    return key in mem ? mem[key] : null;
+  }
+  function saveStr(key, value) {
+    mem[key] = value;
+    try { localStorage.setItem(key, value); } catch (e) {}
+  }
+  function load(key, fallback) {
+    const raw = loadStr(key);
+    if (raw === null) return fallback;
+    try { return JSON.parse(raw); } catch (e) { return fallback; }
+  }
+  function save(key, value) { saveStr(key, JSON.stringify(value)); }
+
+  /* ---------------- elements ---------------- */
+  const setupScreen = $('setupScreen');
+  const signinScreen = $('signinScreen');
+  const thanksScreen = $('thanksScreen');
+  const setupAddress = $('setupAddress');
+  const startBtn = $('startBtn');
+  const displayAddress = $('displayAddress');
+  const form = $('signinForm');
+  const submitBtn = $('submitBtn');
+  const missingHint = $('missingHint');
+  const fullName = $('fullName');
+  const emailEl = $('email');
+  const phoneEl = $('phone');
+  const agentNameInput = $('agentName');
+  const noAgentBtn = $('noAgentBtn');
+  const syncStatus = $('syncStatus');
+
+  /* ---------------- screens ---------------- */
+  function showScreen(screen) {
+    signinScreen.classList.remove('active');
+    thanksScreen.classList.remove('active');
+    if (screen === setupScreen) {
+      setupScreen.style.display = 'flex';
+      renderStaff();
+    } else {
+      setupScreen.style.display = 'none';
+      screen.classList.add('active');
+    }
+  }
+
+  function goToSignin(address) {
+    displayAddress.textContent = address;
+    renderListing();
+    showScreen(signinScreen);
+  }
+
+  /* ---------------- background photos ---------------- */
+  // To add a photo: put name.jpg and name-thumb.jpg in assets/bg, add a line here,
+  // add both files to the list in sw.js, and bump its VERSION.
+  const PHOTOS = [
+    { id: 'ocean', label: 'Ocean' },
+    { id: 'canal', label: 'Canal' },
+    { id: 'sunrise', label: 'Sunrise' },
+    { id: 'beach', label: 'Beach' },
+    { id: 'mountain', label: 'Mountain' },
+    { id: 'palms', label: 'Palms' },
+    { id: 'ridge', label: 'Ridge' }
+  ];
+  function currentPhoto() {
+    const id = loadStr(KEYS.photo);
+    return PHOTOS.some((p) => p.id === id) ? id : PHOTOS[0].id;
+  }
+  function applyPhoto(id) {
+    document.documentElement.style.setProperty('--bg-photo', "url('assets/bg/" + id + ".jpg')");
+    document.querySelectorAll('.photo-opt').forEach((b) => b.setAttribute('aria-checked', String(b.dataset.id === id)));
+  }
+  (function buildPhotoGrid() {
+    const grid = $('photoGrid');
+    PHOTOS.forEach((p) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'photo-opt';
+      b.dataset.id = p.id;
+      b.setAttribute('role', 'radio');
+      b.setAttribute('aria-label', p.label);
+      b.innerHTML = '<img src="assets/bg/' + p.id + '-thumb.jpg" alt="" loading="lazy"><span>' + p.label + '</span>';
+      b.addEventListener('click', () => { saveStr(KEYS.photo, p.id); applyPhoto(p.id); });
+      grid.appendChild(b);
+    });
+  })();
+
+  /* ---------------- listing details ---------------- */
+  const DETAIL_FIELDS = { price: 'dPrice', beds: 'dBeds', baths: 'dBaths', sqft: 'dSqft', lot: 'dLot', hoa: 'dHoa' };
+  const isNum = (s) => /^\$?\s*[\d,]*\.?\d+\s*$/.test(s);
+  const num = (s) => Number(String(s).replace(/[$,\s]/g, ''));
+  const commas = (n) => n.toLocaleString('en-US', { maximumFractionDigits: 2 });
+
+  function fmtPrice(v) { return isNum(v) ? '$' + commas(num(v)) : v; }
+  function fmtSqft(v) { return isNum(v) ? commas(num(v)) : v.replace(/\s*(sq\.?\s*ft\.?|sf|sqft)\s*$/i, ''); }
+  function fmtLot(v) {
+    if (!isNum(v)) return v;
+    const n = num(v);
+    return n < 50 ? commas(n) + ' acre' + (n === 1 ? '' : 's') : commas(n) + ' sq ft';
+  }
+  function fmtHoa(v) {
+    if (/^(none|no|0|\$?0)$/i.test(v)) return 'None';
+    return isNum(v) ? '$' + commas(num(v)) + '/mo' : v;
+  }
+
+  function loadDetails() { return load(KEYS.details, {}) || {}; }
+
+  function renderListing() {
+    const d = loadDetails();
+    const clean = (k) => (d[k] || '').toString().trim();
+    const stats = [];
+    if (clean('beds')) stats.push([clean('beds'), num(clean('beds')) === 1 ? 'Bedroom' : 'Bedrooms']);
+    if (clean('baths')) stats.push([clean('baths'), num(clean('baths')) === 1 ? 'Bathroom' : 'Bathrooms']);
+    if (clean('sqft')) stats.push([fmtSqft(clean('sqft')), 'Home sq ft']);
+    if (clean('lot')) {
+      const lot = clean('lot');
+      if (isNum(lot) && num(lot) < 50) stats.push([commas(num(lot)), 'Acre lot']);
+      else if (isNum(lot)) stats.push([commas(num(lot)), 'Lot sq ft']);
+      else stats.push([lot, 'Lot size']);
+    }
+    if (clean('hoa')) stats.push([fmtHoa(clean('hoa')), 'HOA']);
+
+    const price = clean('price') ? fmtPrice(clean('price')) : '';
+    $('lPrice').textContent = price;
+    const dl = $('lStats');
+    dl.textContent = '';
+    stats.forEach(([val, label]) => {
+      const wrap = document.createElement('div');
+      const dd = document.createElement('dd'); dd.textContent = val;
+      const dt = document.createElement('dt'); dt.textContent = label;
+      wrap.appendChild(dd); wrap.appendChild(dt);   // value first, label under it
+      dl.appendChild(wrap);
+    });
+    const any = !!price || stats.length > 0;
+    $('listing').hidden = !any;
+    signinScreen.classList.toggle('has-listing', any);
+  }
+
+  function fillDetailInputs() {
+    const d = loadDetails();
+    Object.keys(DETAIL_FIELDS).forEach((k) => { $(DETAIL_FIELDS[k]).value = d[k] || ''; });
+  }
+  function saveDetailInputs() {
+    const d = {};
+    Object.keys(DETAIL_FIELDS).forEach((k) => { d[k] = $(DETAIL_FIELDS[k]).value.trim(); });
+    save(KEYS.details, d);
+  }
+
+  setupAddress.addEventListener('input', () => {
+    startBtn.disabled = setupAddress.value.trim().length === 0;
+  });
+  setupAddress.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !startBtn.disabled) startBtn.click();
+  });
+  startBtn.addEventListener('click', () => {
+    const addr = setupAddress.value.trim();
+    if (!addr) return;
+    saveStr(KEYS.address, addr);
+    saveDetailInputs();
+    goToSignin(addr);
+    fullName.focus();
+  });
+  $('changeAddressBtn').addEventListener('click', () => {
+    if (CONFIG.STAFF_PIN) {
+      const entered = window.prompt('Staff PIN');
+      if (entered === null || entered.trim() !== CONFIG.STAFF_PIN) return;
+    }
+    setupAddress.value = displayAddress.textContent === '—' ? '' : displayAddress.textContent;
+    fillDetailInputs();
+    startBtn.disabled = setupAddress.value.trim().length === 0;
+    showScreen(setupScreen);
+  });
+
+  /* ---------------- chips ---------------- */
+  function setupChipGroup(groupId) {
+    const group = $(groupId);
+    const chips = group.querySelectorAll('.chip');
+    chips.forEach((chip) => {
+      chip.addEventListener('click', () => {
+        const was = chip.classList.contains('selected');
+        chips.forEach((c) => c.classList.remove('selected'));
+        if (!was) { chip.classList.add('selected'); group.dataset.value = chip.dataset.val; }
+        else { group.dataset.value = ''; }
+      });
+    });
+  }
+  setupChipGroup('timelineGroup');
+  setupChipGroup('sourceGroup');
+
+  /* ---------------- agent field / button ---------------- */
+  agentNameInput.addEventListener('input', () => {
+    if (agentNameInput.value.trim()) noAgentBtn.classList.remove('selected');
+    validateForm();
+  });
+  noAgentBtn.addEventListener('click', () => {
+    const nowSelected = !noAgentBtn.classList.contains('selected');
+    noAgentBtn.classList.toggle('selected', nowSelected);
+    if (nowSelected) agentNameInput.value = '';
+    validateForm();
+  });
+
+  /* ---------------- phone formatting + validation ---------------- */
+  const digits = (s) => (s || '').replace(/\D/g, '');
+
+  function formatPhoneLive(v) {
+    if (v.trim().startsWith('+')) return v;
+    let d = digits(v);
+    if (d.length > 10 && d[0] === '1') d = d.slice(1);
+    d = d.slice(0, 10);
+    if (d.length < 4) return d;
+    if (d.length < 7) return '(' + d.slice(0, 3) + ') ' + d.slice(3);
+    return '(' + d.slice(0, 3) + ') ' + d.slice(3, 6) + '-' + d.slice(6);
+  }
+  const phoneOk = (v) => (v.trim().startsWith('+') ? digits(v).length >= 8 : digits(v).length >= 10);
+  const emailOk = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim());
+
+  phoneEl.addEventListener('input', () => {
+    const f = formatPhoneLive(phoneEl.value);
+    if (f !== phoneEl.value) phoneEl.value = f;
+    validateForm();
+  });
+  [fullName, emailEl].forEach((el) => el.addEventListener('input', validateForm));
+
+  function validateForm() {
+    const missing = [];
+    if (!fullName.value.trim()) missing.push('your name');
+    if (!emailOk(emailEl.value)) missing.push('a valid email');
+    if (!phoneOk(phoneEl.value)) missing.push('a 10-digit phone number');
+    const agentAnswered = agentNameInput.value.trim() || noAgentBtn.classList.contains('selected');
+    if (!agentAnswered) missing.push('your agent question');
+    submitBtn.disabled = missing.length > 0;
+    missingHint.textContent = (missing.length >= 1 && missing.length <= 2) ? 'Still needed: ' + missing.join(' and ') : '';
+  }
+
+  /* ---------------- save-first queue ---------------- */
+  function newId() {
+    try { if (window.crypto && crypto.randomUUID) return crypto.randomUUID(); } catch (e) {}
+    return Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 12);
+  }
+
+  function enqueue(entry) {
+    // 1) the queue (what still has to reach the sheet)
+    const q = load(KEYS.queue, []);
+    q.push(entry);
+    save(KEYS.queue, q);
+    // 2) a permanent local copy, so nothing can ever be lost on the iPad
+    const b = load(KEYS.backup, []);
+    b.push(entry);
+    save(KEYS.backup, b.slice(-BACKUP_MAX));
+    updateStatus();
+  }
+
+  let flushing = false;
+  let retryTimer = null;
+  let retryDelay = 10000;
+  let lastError = '';
+
+  function getEndpoint() {
+    const url = (loadStr(KEYS.endpoint) || CONFIG.ENDPOINT || '').trim();
+    return url && !/PASTE_/i.test(url) ? url : '';
+  }
+
+  async function sendEntry(endpoint, entry) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), SEND_TIMEOUT_MS);
+    try {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        // text/plain keeps this a "simple" request, so Google does not need a CORS preflight
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(entry),
+        redirect: 'follow',
+        signal: ctrl.signal
+      });
+      if (!res.ok) return { status: 'retry', error: 'Server answered ' + res.status };
+      let data;
+      try { data = await res.json(); }
+      catch (e) { return { status: 'retry', error: 'Unexpected reply (check the web app is deployed for "Anyone")' }; }
+      if (data && data.ok === true) return { status: 'ok' };
+      if (data && data.fatal) return { status: 'reject', error: data.error || 'Rejected' };
+      return { status: 'retry', error: (data && data.error) || 'Server error' };
+    } catch (e) {
+      return { status: 'retry', error: e && e.name === 'AbortError' ? 'Timed out' : 'No connection' };
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  async function flushQueue() {
+    if (flushing) return;
+    const endpoint = getEndpoint();
+    if (!endpoint || load(KEYS.queue, []).length === 0) { updateStatus(); return; }
+    if (navigator.onLine === false) { lastError = 'No connection'; updateStatus(); return; }
+
+    flushing = true;
+    updateStatus();
+    let failed = false;
+    try {
+      for (;;) {
+        const q = load(KEYS.queue, []);
+        if (!q.length) break;
+        const entry = q[0];
+        const r = await sendEntry(endpoint, entry);
+        if (r.status === 'ok') {
+          save(KEYS.queue, load(KEYS.queue, []).filter((e) => e.id !== entry.id));
+          saveStr(KEYS.lastSync, String(Date.now()));
+          lastError = '';
+          retryDelay = 10000;
+        } else if (r.status === 'reject') {
+          // Server refused this one for good. Keep it aside so it never blocks the others.
+          const bad = load(KEYS.failed, []);
+          bad.push(Object.assign({}, entry, { error: r.error }));
+          save(KEYS.failed, bad);
+          save(KEYS.queue, load(KEYS.queue, []).filter((e) => e.id !== entry.id));
+          lastError = r.error;
+        } else {
+          lastError = r.error;
+          failed = true;
+          break;
+        }
+        updateStatus();
+      }
+    } finally {
+      flushing = false;
+      updateStatus();
+    }
+    if (failed) scheduleRetry();
+  }
+
+  function scheduleRetry() {
+    if (retryTimer) return;
+    retryTimer = setTimeout(() => { retryTimer = null; flushQueue(); }, retryDelay);
+    retryDelay = Math.min(retryDelay * 2, 120000);
+  }
+
+  window.addEventListener('online', () => { retryDelay = 10000; flushQueue(); });
+  window.addEventListener('offline', updateStatus);
+  setInterval(() => { if (!flushing && load(KEYS.queue, []).length) flushQueue(); }, 30000);
+
+  /* ---------------- status badge ---------------- */
+  function updateStatus() {
+    const q = load(KEYS.queue, []).length;
+    const bad = load(KEYS.failed, []).length;
+    const online = navigator.onLine !== false;
+    let state = 'ok';
+    let text = 'All synced';
+    if (!getEndpoint()) { state = 'warn'; text = q ? 'Not connected · ' + q + ' saved on iPad' : 'Not connected yet'; }
+    else if (flushing) { state = 'warn'; text = 'Sending ' + q + '…'; }
+    else if (q > 0) { state = 'warn'; text = online ? q + ' waiting to send' : 'Offline · ' + q + ' saved on iPad'; }
+    else if (!online) { state = 'off'; text = 'Offline · sign-ins are being saved'; }
+    if (bad) {
+      if (state === 'ok') { state = 'warn'; text = bad + ' sign-in' + (bad > 1 ? 's' : '') + ' need attention (see Staff setup)'; }
+      else text += ' · ' + bad + ' need attention';
+    }
+    syncStatus.dataset.state = state;
+    syncStatus.querySelector('.sync-text').textContent = text;
+    if (setupScreen.style.display === 'flex') renderStaff();
+  }
+  syncStatus.addEventListener('click', () => { retryDelay = 10000; flushQueue(); });
+
+  /* ---------------- staff tools ---------------- */
+  function renderStaff() {
+    const q = load(KEYS.queue, []).length;
+    const bad = load(KEYS.failed, []).length;
+    const ep = getEndpoint();
+    const last = loadStr(KEYS.lastSync);
+    $('stConn').textContent = !ep ? 'Not set' : (navigator.onLine === false ? 'Set · offline' : 'Set · online');
+    $('stQueue').textContent = String(q) + (bad ? ' (+' + bad + ' need attention)' : '');
+    $('stLast').textContent = last ? new Date(Number(last)).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : 'never';
+    $('stErrRow').hidden = !lastError;
+    $('stErr').textContent = lastError;
+    $('connWarn').hidden = !!ep;
+    if (document.activeElement !== $('endpointInput')) $('endpointInput').value = loadStr(KEYS.endpoint) || '';
+  }
+
+  $('saveEndpointBtn').addEventListener('click', () => {
+    const v = $('endpointInput').value.trim();
+    const msg = $('endpointMsg');
+    if (!v) { localStorage.removeItem(KEYS.endpoint); delete mem[KEYS.endpoint]; msg.textContent = 'Cleared.'; renderStaff(); return; }
+    if (!/^https:\/\/script\.google\.com\/(a\/[^/]+\/)?macros\/s\/[\w-]+\/exec$/.test(v)) {
+      msg.textContent = 'That doesn’t look like a web app URL. It should start with https://script.google.com/macros/s/ and end in /exec.';
+      return;
+    }
+    saveStr(KEYS.endpoint, v);
+    msg.textContent = 'Saved. Sending anything that is waiting…';
+    renderStaff();
+    flushQueue();
+  });
+
+  $('syncNowBtn').addEventListener('click', () => { retryDelay = 10000; flushQueue(); });
+
+  $('testEntryBtn').addEventListener('click', () => {
+    enqueue({
+      id: newId(), fullName: 'Test Guest', email: 'test@example.com', phone: '(808) 555-1234',
+      agentName: null, hasAgent: false, timeline: '0-3mo', source: 'other',
+      propertyAddress: 'TEST connection check', submittedAt: new Date().toISOString()
+    });
+    $('endpointMsg').textContent = 'Test sign-in queued. It should appear on the "Open House (Test)" tab.';
+    flushQueue();
+  });
+
+  function csvCell(v) {
+    let s = v === null || v === undefined ? '' : String(v);
+    if (/^[=+\-@\t\r]/.test(s) && !/^\+[\d\s().-]+$/.test(s)) s = "'" + s;
+    return '"' + s.replace(/"/g, '""') + '"';
+  }
+  function localStamp(iso) {
+    const d = new Date(iso);
+    if (isNaN(d)) return '';
+    const p = (n) => String(n).padStart(2, '0');
+    return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+  }
+  $('csvBtn').addEventListener('click', () => {
+    const rows = load(KEYS.backup, []);
+    const waiting = new Set(load(KEYS.queue, []).concat(load(KEYS.failed, [])).map((e) => e.id));
+    const out = [['Signed in', 'Property', 'Name', 'Email', 'Phone', 'Agent', 'Timeline', 'Heard about', 'In Google Sheet?']];
+    rows.forEach((e) => out.push([
+      localStamp(e.submittedAt), e.propertyAddress, e.fullName, e.email, e.phone,
+      e.hasAgent ? (e.agentName || 'Yes (name not given)') : 'No agent',
+      TIMELINE_LABELS[e.timeline] || '', SOURCE_LABELS[e.source] || '',
+      waiting.has(e.id) ? 'NOT YET' : 'yes'
+    ]));
+    const csv = '﻿' + out.map((r) => r.map(csvCell).join(',')).join('\r\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+    a.download = 'open-house-backup-' + localStamp(new Date().toISOString()).slice(0, 10) + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  });
+
+  /* ---------------- submit / reset ---------------- */
+  function resetForm() {
+    form.reset();
+    noAgentBtn.classList.remove('selected');
+    document.querySelectorAll('.chip-group').forEach((g) => {
+      g.dataset.value = '';
+      g.querySelectorAll('.chip').forEach((c) => c.classList.remove('selected'));
+    });
+    submitBtn.disabled = true;
+    missingHint.textContent = '';
+    const panel = document.querySelector('.form-panel');
+    if (panel) panel.scrollTop = 0;
+  }
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (submitBtn.disabled) return;
+
+    const name = fullName.value.trim().replace(/\s+/g, ' ');
+    const noAgent = noAgentBtn.classList.contains('selected');
+    const entry = {
+      id: newId(),
+      fullName: name,
+      email: emailEl.value.trim().toLowerCase(),
+      phone: phoneEl.value.trim(),
+      agentName: noAgent ? null : agentNameInput.value.trim(),
+      hasAgent: !noAgent,
+      timeline: $('timelineGroup').dataset.value || null,
+      source: $('sourceGroup').dataset.value || null,
+      propertyAddress: displayAddress.textContent,
+      submittedAt: new Date().toISOString()
+    };
+
+    // Save on the iPad FIRST. The guest never waits on wifi, and nothing can be lost.
+    enqueue(entry);
+
+    // Clear the guest's details off the screen right away (privacy for the next visitor).
+    resetForm();
+    $('thanksHeadline').textContent = 'Mahalo, ' + name.split(' ')[0] + '!';
+    showScreen(thanksScreen);
+
+    flushQueue();
+  });
+
+  function updateQuizBtn() { $('quizBtn').hidden = navigator.onLine === false; }
+  window.addEventListener('online', updateQuizBtn);
+  window.addEventListener('offline', updateQuizBtn);
+
+  $('nextVisitorBtn').addEventListener('click', () => {
+    showScreen(signinScreen);
+    fullName.focus();
+  });
+
+  /* ---------------- keep the screen awake, ask the iPad not to evict our data ---------------- */
+  let wakeLock = null;
+  async function keepAwake() {
+    try {
+      if ('wakeLock' in navigator && document.visibilityState === 'visible' && !wakeLock) {
+        wakeLock = await navigator.wakeLock.request('screen');
+        wakeLock.addEventListener('release', () => { wakeLock = null; });
+      }
+    } catch (e) {}
+  }
+  document.addEventListener('pointerdown', keepAwake);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') { keepAwake(); retryDelay = 10000; flushQueue(); }
+  });
+  try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
+
+  /* ---------------- offline app shell ---------------- */
+  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+    window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').catch(() => {}); });
+  }
+
+  /* ---------------- start ---------------- */
+  (function init() {
+    applyPhoto(currentPhoto());
+    fillDetailInputs();
+    updateQuizBtn();
+    const saved = loadStr(KEYS.address);
+    if (saved) goToSignin(saved); else showScreen(setupScreen);
+    validateForm();
+    updateStatus();
+    flushQueue();   // pick up anything left over from before (e.g. iPad was closed while offline)
+  })();
+})();
+</script>
+
+</body>
+</html>
