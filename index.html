@@ -120,7 +120,7 @@
 
   .field label {
     display: block;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 500;
     margin-bottom: 8px;
     color: var(--deep-ocean);
@@ -543,9 +543,7 @@
 
   /* Even, aligned choice buttons */
   #timelineGroup { display: grid; grid-template-columns: repeat(3, 1fr); }
-  #sourceGroup { display: grid; grid-template-columns: repeat(6, 1fr); }
-  #sourceGroup .chip:nth-child(-n+3) { grid-column: span 2; }
-  #sourceGroup .chip:nth-child(n+4) { grid-column: span 3; }
+  #sourceGroup { display: grid; grid-template-columns: repeat(3, 1fr); }
   #timelineGroup .chip, #sourceGroup .chip { padding-left: 8px; padding-right: 8px; }
 
   /* ---------- photo + team logo ---------- */
@@ -648,6 +646,21 @@
   .photo-opt[aria-checked="true"] { border-color: var(--sunset-gold); box-shadow: 0 0 0 2px var(--sunset-gold); }
 
   /* ---------- quiz button ---------- */
+  .photo-credit {
+    position: absolute; left: 0; right: 0; bottom: 18px;
+    text-align: center; font-size: 12px; letter-spacing: 0.04em;
+    color: rgba(255,255,255,0.6); pointer-events: none;
+  }
+  .quiz-row {
+    display: flex; align-items: center; justify-content: center; gap: 22px;
+    margin-top: 34px;
+  }
+  .quiz-row .quiz-btn { margin-top: 0; flex: none; white-space: nowrap; }
+  .quiz-qr { flex: none; }
+  .quiz-qr span { white-space: nowrap; }
+  .quiz-qr { display: flex; align-items: center; gap: 12px; text-align: left; }
+  .quiz-qr img { display: block; width: 84px; height: 84px; padding: 5px; background: #fff; border-radius: 4px; }
+  .quiz-qr span { font-size: 13px; line-height: 1.4; color: rgba(255,255,255,0.82); }
   .quiz-btn {
     display: inline-flex; flex-direction: column; align-items: center; gap: 4px;
     margin-top: 34px; padding: 16px 30px;
@@ -696,6 +709,32 @@
     .detail-grid { grid-template-columns: repeat(2, 1fr); }
     .photo-grid { grid-template-columns: repeat(3, 1fr); }
     .agent-row .chip-block { flex: none; width: 100%; }
+  }
+
+  /* ===== Photo on the left panel, form on a solid panel ===== */
+  .brand-panel { flex-basis: 42%; background-size: cover; background-position: center; }
+  .form-panel {
+    background: var(--soft-white);
+    padding: 34px 48px;
+    align-items: center;
+  }
+  .form-inner { max-width: 620px; }
+  .form-inner .field { margin-bottom: 18px; }
+  .form-inner .chip { padding-top: 13px; padding-bottom: 13px; }
+  .form-inner input[type="text"], .form-inner input[type="email"], .form-inner input[type="tel"] { padding-top: 15px; padding-bottom: 15px; }
+  #welcomeLine { margin-bottom: 8px; }
+  .form-inner p.lede { margin-bottom: 26px; }
+  #submitBtn { margin-top: 10px !important; }
+  .form-inner .required-note { margin-top: 14px; }
+  .brand-bottom { border-top-color: rgba(255,255,255,0.22); }
+  .listing-stats dt { white-space: nowrap; }
+  @media (max-width: 1100px) and (min-width: 861px) {
+    .brand-panel { padding-left: 34px; padding-right: 24px; }
+    .listing-stats { column-gap: 20px; }
+    .form-panel { padding: 30px 36px; }
+  }
+  @media (max-width: 860px) {
+    .form-panel { padding: 22px 20px; }
   }
 </style>
 </head>
@@ -826,10 +865,8 @@
           <div class="field">
             <label>How did you hear about this open house? <span class="optional-tag">(optional)</span></label>
             <div class="chip-group" id="sourceGroup" data-value="">
-              <button type="button" class="chip" data-val="sign">Drove by / Sign</button>
-              <button type="button" class="chip" data-val="zillow">Zillow</button>
-              <button type="button" class="chip" data-val="online">Online Search</button>
-              <button type="button" class="chip" data-val="realtor">My Realtor</button>
+              <button type="button" class="chip" data-val="sign">Drove By / Signs</button>
+              <button type="button" class="chip" data-val="online">Online / Zillow</button>
               <button type="button" class="chip" data-val="other">Other</button>
             </div>
           </div>
@@ -848,12 +885,19 @@
       <img class="thanks-logo" src="assets/logo-white.png" alt="Hawaii LUX of eXp Realty">
       <h2 class="serif" id="thanksHeadline">Mahalo!</h2>
       <p>You're all set. Peter will follow up with you soon, thanks for stopping by the open house today.</p>
-      <a class="quiz-btn" id="quizBtn" href="https://pvanosdall.github.io/Oahu-Real-Estate-Quiz/">
-        <span class="quiz-q">Want personalized properties?</span>
-        <span class="quiz-cta">Take my 60-second home quiz</span>
-      </a>
+      <div class="quiz-row">
+        <a class="quiz-btn" id="quizBtn" href="https://pvanosdall.github.io/Oahu-Real-Estate-Quiz/">
+          <span class="quiz-q">Want personalized properties?</span>
+          <span class="quiz-cta">Take my 60-second home quiz</span>
+        </a>
+        <div class="quiz-qr">
+          <img src="assets/quiz-qr.svg" alt="QR code for the home quiz" width="84" height="84">
+          <span>Or scan to take it<br>on your phone</span>
+        </div>
+      </div>
     </div>
     <button class="next-visitor" id="nextVisitorBtn">Next visitor →</button>
+    <div class="photo-credit">Photo by Peter Vanosdall</div>
   </div>
 
 </div>
@@ -891,7 +935,7 @@
   const SEND_TIMEOUT_MS = 25000;
 
   const TIMELINE_LABELS = { 'browsing': 'Just looking', '0-3mo': '0 to 3 months', '12mo': '3-12 months' };
-  const SOURCE_LABELS = { sign: 'Drove by / Sign', zillow: 'Zillow', online: 'Online Search', realtor: 'My Realtor', other: 'Other', referral: 'Referral' };
+  const SOURCE_LABELS = { sign: 'Drove By / Signs', online: 'Online / Zillow', other: 'Other', zillow: 'Zillow', realtor: 'My Realtor', referral: 'Referral' };
 
   const $ = (id) => document.getElementById(id);
 

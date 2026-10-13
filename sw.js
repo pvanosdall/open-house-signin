@@ -7,7 +7,7 @@
  * To ship a change: edit the files, bump VERSION below, upload to GitHub.
  * The iPad picks up the new version the next time it opens the page online.
  */
-const VERSION = 'ohs-v4';
+const VERSION = 'ohs-v9';
 
 const SHELL = [
   './',
@@ -17,6 +17,7 @@ const SHELL = [
   './fonts/work-sans-latin-wght-normal.woff2',
   './assets/logo-white.png',
   './assets/logo-dark.png',
+  './assets/quiz-qr.svg',
   './assets/bg/ocean.jpg',
   './assets/bg/ocean-thumb.jpg',
   './assets/bg/canal.jpg',
